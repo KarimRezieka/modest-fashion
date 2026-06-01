@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { CartDrawer } from "@/components/cart/cart-drawer";
 
 const sidebarLinks = [
   { href: "/profile", label: "Account" },
@@ -37,6 +38,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
         </div>
       </div>
       <Footer />
+      <CartDrawer />
     </>
   );
 }

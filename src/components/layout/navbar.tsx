@@ -4,7 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { User, Heart, ShoppingBag, Menu, X } from "lucide-react";
+import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -17,6 +19,7 @@ const navLinks = [
 export function Navbar() {
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuth();
+  const { toggle: toggleCart, itemCount } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
 
@@ -53,9 +56,23 @@ export function Navbar() {
             <Heart size={18} />
           </Link>
 
-          <Link href="/cart" className="text-[#F5F1EB]/50 hover:text-[#F5F1EB] transition-colors">
+          <button
+            onClick={toggleCart}
+            className="relative text-[#F5F1EB]/50 hover:text-[#F5F1EB] transition-colors"
+            aria-label="Open cart"
+          >
             <ShoppingBag size={18} />
-          </Link>
+            {itemCount > 0 && (
+              <motion.span
+                key={itemCount}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#7A8471] rounded-full text-[9px] text-[#F5F1EB] flex items-center justify-center"
+              >
+                {itemCount > 9 ? "9+" : itemCount}
+              </motion.span>
+            )}
+          </button>
 
           <div className="relative">
             <button

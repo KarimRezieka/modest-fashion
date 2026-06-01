@@ -6,6 +6,7 @@ import { Heart, ShoppingBag, ChevronDown, ArrowLeft } from "lucide-react";
 import { useProduct } from "@/hooks/useProducts";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { ImageGallery } from "@/components/products/image-gallery";
 import { SizeSelector, ColorSelector } from "@/components/products/variant-selector";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ export default function ProductPage({ params }: PageProps) {
   const { product, loading, error } = useProduct(slug);
   const { isAuthenticated } = useAuth();
   const { items: wishlistItems, addToWishlist, removeFromWishlist, isWishlisted } = useWishlist();
+  const { addToCart, isLoading: cartLoading } = useCart();
 
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -151,7 +153,30 @@ export default function ProductPage({ params }: PageProps) {
           <div className="flex gap-3">
             <Button
               className="flex-1"
-              disabled={!product.inStock || (sizes.length > 0 && !selectedSize)}
+              disabled={!product.inStock || (sizes.length > 0 && !selectedSize) || cartLoading}
+              loading={cartLoading}
+              onClick={async () => {
+                if (!product) return;
+                const selectedVariant = product.variants.find(
+                  (v) => (selectedSize ? v.size === selectedSize : true) &&
+                         (selectedColor ? v.color === selectedColor : true)
+                ) ?? null;
+                await addToCart(
+                  {
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    price: product.price,
+                    comparePrice: product.comparePrice,
+                    inStock: product.inStock,
+                    images: product.images.map((i) => ({ url: i.url, alt: i.alt })),
+                  },
+                  selectedVariant
+                    ? { id: selectedVariant.id, size: selectedVariant.size, color: selectedVariant.color, colorHex: selectedVariant.colorHex, stock: selectedVariant.stock }
+                    : null,
+                  quantity
+                );
+              }}
             >
               <ShoppingBag size={16} />
               Add to Cart
