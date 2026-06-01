@@ -14,9 +14,10 @@ interface ProductFormProps {
   categories: Category[];
   loading?: boolean;
   onSubmit: (data: CreateProductInput) => Promise<void>;
+  defaultValues?: Partial<CreateProductInput>;
 }
 
-export function ProductForm({ categories, loading, onSubmit }: ProductFormProps) {
+export function ProductForm({ categories, loading, onSubmit, defaultValues }: ProductFormProps) {
   const {
     register,
     handleSubmit,
@@ -24,7 +25,7 @@ export function ProductForm({ categories, loading, onSubmit }: ProductFormProps)
     formState: { errors },
   } = useForm<CreateProductInput>({
     resolver: zodResolver(createProductSchema),
-    defaultValues: { images: [], variants: [], inStock: true, featured: false, published: true },
+    defaultValues: defaultValues ?? { images: [], variants: [], inStock: true, featured: false, published: true },
   });
 
   const { fields: imageFields, append: addImage, remove: removeImage } = useFieldArray({ control, name: "images" });
